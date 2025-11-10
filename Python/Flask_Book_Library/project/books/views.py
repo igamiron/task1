@@ -2,6 +2,7 @@ from flask import render_template, Blueprint, request, redirect, url_for, jsonif
 from project import db
 from project.books.models import Book
 from project.books.forms import CreateBook
+from markupsafe import escape
 
 
 # Blueprint for books
@@ -30,9 +31,15 @@ def list_books_json():
 # Route to create a new book
 @books.route('/create', methods=['POST', 'GET'])
 def create_book():
-    data = request.get_json()
+    # Read form fields and escape HTML/JS
+    name = escape(request.form.get('name', ''))
+    author = escape(request.form.get('author', ''))
+    year_published = escape(request.form.get('year_published', ''))
+    book_type = escape(request.form.get('book_type', ''))
+    
+    #data = request.get_json()
 
-    new_book = Book(name=data['name'], author=data['author'], year_published=data['year_published'], book_type=data['book_type'])
+    new_book = Book(name=name['name'], author=author['author'], year_published=year_published['year_published'], book_type=book_type['book_type'])
 
     try:
         # Add the new book to the session and commit to save to the database
